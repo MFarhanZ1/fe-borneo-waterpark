@@ -7,16 +7,8 @@ export const NavMenuItems: NavMenuProps = {
       location_target: "/#beranda",
     },
     {
-      label: "Fitur Unggulan Kami",
-      location_target: "/#fitur-kami",
-    },
-    {
-      label: "Kontributor",
-      location_target: "/#kontributor",
-    },
-    {
-      label: "FAQs",
-      location_target: "/#faqs",
-    },
+      label: "Ada apa aja sih disini? 🤩",
+      location_target: "/#layanan-kami",
+    }
   ],
 };

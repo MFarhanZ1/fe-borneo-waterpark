@@ -1,10 +1,8 @@
-import DarkLogoUSR from "@/assets/svgs/DARK_MODE_HIMATIF.svg";
-import LightLogoUSR from "@/assets/svgs/LIGHT_MODE_HIMATIF.svg";
+import BorneoWaterparkLogo from "@/assets/svgs/borneo-waterpark-logo.svg"
 import { ModeToggle } from "../../themes/mode-toggle";
 import { Button } from "@/components/ui/button";
 import { ArrowUpRight, LucideLogIn, Menu } from "lucide-react";
 import { HeaderLandingPageProps } from "@/interfaces/components/globals/headers/header-landing-page.interface";
-import { useTheme } from "@/components/themes/theme-provider";
 import { NavMenu } from "./nav-menu";
 import { NavMenuItems } from "@/constants/components/globals/headers/nav-menu-item.constant";
 import { NavLink } from "react-router-dom";
@@ -26,19 +24,15 @@ const HeaderLandingPageComponent = ({
   isAuthenticated,
   dashboardURL,
 }: HeaderLandingPageProps) => {
-  const { theme } = useTheme();
+
   return (
-    <header className="flex items-center justify-between w-full h-12 py-2 pl-2 pr-4 border-b bg-gradient-to-br from-blue-600/10 via-indigo-600/10 to-pink-500/10 border-blue-600/20">
+    <header className="flex items-center justify-between w-full h-12 py-8 mb-5 px-40 border-b bg-gradient-to-br from-blue-600/10 via-indigo-600/10 to-pink-500/10 border-blue-600/20">
       {/* Header Logo */}
       <NavLink to={"/"} className="flex items-center justify-center gap-4">
-        <div className="flex items-center gap-1.5 hover:bg-secondary hover:text-secondary-foreground cursor-pointer hover:scale-95 px-2 duration-300 rounded-xl active:scale-105">
-          {theme === "dark" ? (
-            <img src={DarkLogoUSR} className="w-8 h-8" />
-          ) : (
-            <img src={LightLogoUSR} className="w-8 h-8" />
-          )}
-          <span className="text-base font-semibold">
-            dashboard<span className="italic font-medium">.hima-tif-usr</span>
+        <div className="flex items-center gap-2 hover:bg-secondary hover:text-secondary-foreground cursor-pointer hover:scale-95 px-2 duration-300 rounded-xl active:scale-105">
+          <img src={BorneoWaterparkLogo} className="w-12 h-12" />        
+          <span className="text-2xl text-[#313131] font-semibold tracking-tighter">
+            Borneo Waterpark.
           </span>
         </div>
       </NavLink>
@@ -121,7 +115,7 @@ const HeaderLandingPageComponent = ({
             </AlertDialogTrigger>
           )}
           {/* Theme Toggle */}
-          <ModeToggle />
+          {/* <ModeToggle /> */}
         </div>
       </div>
       <AlertDialogContent>
