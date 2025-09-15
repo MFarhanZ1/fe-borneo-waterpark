@@ -21,11 +21,6 @@ import { WarpBackground } from "@/components/magic-ui/warp-background";
 import { HashLink } from "react-router-hash-link";
 import GradientText from "@/components/react-bits/gradient-text";
 import Ballpit from "@/components/react-bits/ballpit";
-import {
-	AnimatedSpan,
-	Terminal,
-	TypingAnimation,
-} from "@/components/magic-ui/terminal";
 import { GridPattern } from "@/components/magicui/grid-pattern";
 import { cn } from "@/lib/utils";
 import {
