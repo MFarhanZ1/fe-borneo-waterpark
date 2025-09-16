@@ -10,7 +10,7 @@ import LokerPreview from "@/assets/svgs/loker-preview.svg";
 import HeaderLandingPageComponent from "@/components/globals/headers/header-landing-page";
 import LoadingComponent from "@/components/globals/loading";
 import { handleGoToDashboard } from "@/utils/pages/publics/landing.page.util";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "react-oidc-context";
 import { RetroGrid } from "@/components/magic-ui/retro-grid";
 import { PhoneCall, Mail, MapPin } from "lucide-react";
@@ -23,12 +23,104 @@ import { cn } from "@/lib/utils";
 import DomeGallery from "@/components/magic-ui/dome-gallery";
 import CircularGallery from "@/components/react-bits/circular-gallery";
 
-const waterparkInfo = {
-	whatsapp: "6282288326325",
-	gmapsUrl: "https://maps.app.goo.gl/6kMDkQQzz3S3z2vg8",
-};
+// --- (1) TYPESCRIPT: Menambahkan Definisi Tipe ---
+// Ini mendefinisikan bentuk objek untuk informasi waterpark.
+interface IWaterparkInfo {
+	whatsapp: string;
+	gmapsUrl: string;
+}
+
+// Ini mendefinisikan tipe data yang akan dikembalikan oleh hook useMemo.
+interface IDayInfo {
+	dayName: string;
+	dayType: "Weekday" | "Weekend";
+	ticketPrice: number;
+}
 
 const LandingPage = () => {
+	const waterparkInfo: IWaterparkInfo = {
+		whatsapp: "6282288326325",
+		gmapsUrl: "https://maps.app.goo.gl/6kMDkQQzz3S3z2vg8",
+	};
+
+	// --- State dengan Tipe Data ---
+	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+	const [paidTickets, setPaidTickets] = useState<number>(1);
+	const [childTickets, setChildTickets] = useState<number>(0);
+
+	// --- useMemo dengan Tipe Data ---
+	const { dayName, dayType, ticketPrice } = useMemo((): IDayInfo => {
+		const dayNames = [
+			"Minggu",
+			"Senin",
+			"Selasa",
+			"Rabu",
+			"Kamis",
+			"Jumat",
+			"Sabtu",
+		];
+		const today = new Date();
+		const dayIndex = today.getDay();
+		const isWeekend = dayIndex === 0 || dayIndex === 6;
+
+		return {
+			dayName: dayNames[dayIndex],
+			dayType: isWeekend ? "Weekend" : "Weekday",
+			ticketPrice: isWeekend ? 40000 : 30000,
+		};
+	}, []);
+
+	const totalPrice = useMemo(
+		() => paidTickets * ticketPrice,
+		[paidTickets, ticketPrice]
+	);
+
+	// --- Fungsi Helper ---
+	const formatCurrency = (amount: number): string => {
+		return new Intl.NumberFormat("id-ID", {
+			style: "currency",
+			currency: "IDR",
+			minimumFractionDigits: 0,
+		}).format(amount);
+	};
+
+	// --- Handler untuk Event ---
+	const handleOpenModal = (): void => setIsModalOpen(true);
+	const handleCloseModal = (): void => setIsModalOpen(false);
+
+	const handlePaidTicketChange = (amount: number): void => {
+		setPaidTickets((prev) => Math.max(0, prev + amount));
+	};
+
+	const handleChildChange = (amount: number): void => {
+		setChildTickets((prev) => Math.max(0, prev + amount));
+	};
+
+	const handleWhatsAppRedirect = (): void => {
+		let message = `Halo Borneo Waterpark, saya mau pesan tiket.\n\n`;
+		message += `*Rincian Pesanan:*\n`;
+		message += `-------------------------\n`;
+		message += `Hari: *${dayName} (${dayType})*\n\n`;
+
+		if (paidTickets > 0) {
+			message += `🎟️ *Tiket Masuk*\n`;
+			message += `   ${paidTickets} orang x ${formatCurrency(ticketPrice)}\n`;
+		}
+		if (childTickets > 0) {
+			message += `👶 *Anak-anak (Gratis)*\n`;
+			message += `   ${childTickets} anak\n`;
+		}
+
+		message += `-------------------------\n`;
+		message += `*TOTAL: ${formatCurrency(totalPrice)}*\n\n`;
+		message += `Mohon info selanjutnya. Terima kasih!`;
+
+		const encodedMessage = encodeURIComponent(message);
+		const whatsappURL = `https://wa.me/${waterparkInfo.whatsapp}?text=${encodedMessage}`;
+
+		window.open(whatsappURL, "_blank", "noopener,noreferrer");
+	};
+
 	const auth = useAuth();
 
 	const handleKeycloakAuth = () =>
@@ -69,9 +161,8 @@ const LandingPage = () => {
 								<div className="bg-white/80 backdrop-blur-md p-3 rounded-3xl shadow-lg border border-black">
 									<div className="flex flex-col sm:flex-row items-center justify-between gap-2">
 										{/* Pesan Tiket */}
-										<a
-											href={`https://wa.me/${waterparkInfo.whatsapp}?text=Halo%20Borneo%20Waterpark,%20saya%20mau%20pesan%20tiket.`}
-											target="_blank"
+										<div
+											onClick={handleOpenModal}
 											rel="noopener noreferrer"
 											className="flex-1 flex items-center gap-4 p-2 rounded-lg hover:bg-slate-100 transition-colors w-full"
 										>
@@ -87,7 +178,7 @@ const LandingPage = () => {
 													Masuk Santai Tanpa Antri 🔥
 												</p>
 											</div>
-										</a>
+										</div>
 
 										<div className="h-12 w-[2px] rounded-xl bg-cyan-700/50 hidden sm:block"></div>
 										<div className="w-full h-px bg-slate-200 sm:hidden"></div>
@@ -199,9 +290,8 @@ const LandingPage = () => {
 							<div className="bg-white/80 backdrop-blur-md p-3 rounded-3xl shadow-lg border border-black">
 								<div className="flex flex-col sm:flex-row items-center justify-between gap-2">
 									{/* Pesan Tiket */}
-									<a
-										href={`https://wa.me/${waterparkInfo.whatsapp}?text=Halo%20Borneo%20Waterpark,%20saya%20mau%20pesan%20tiket.`}
-										target="_blank"
+									<div
+										onClick={handleOpenModal}
 										rel="noopener noreferrer"
 										className="flex-1 flex items-center gap-4 p-2 rounded-lg hover:bg-slate-100 transition-colors w-full"
 									>
@@ -217,12 +307,158 @@ const LandingPage = () => {
 												Masuk Santai Tanpa Antri 🔥
 											</p>
 										</div>
-									</a>
-									
+									</div>
 								</div>
 							</div>
 						</div>
 
+						{/* Modal Pemesanan Tiket */}
+						{isModalOpen && (
+							<div
+								className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+								onClick={handleCloseModal}
+							>
+								<div
+									className="relative bg-white w-full max-w-3xl rounded-2xl shadow-2xl p-6 md:p-8 m-4"
+									onClick={(e) => e.stopPropagation()}
+								>
+									<button
+										onClick={handleCloseModal}
+										className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors"
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											className="h-6 w-6"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M6 18L18 6M6 6l12 12"
+											/>
+										</svg>
+									</button>
+
+									<h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2">
+										Form Pemesanan Tiket
+									</h2>
+									<p className="text-slate-500 mb-6">
+										Hari ini: <span className="font-bold">{dayName}</span>{" "}
+										<span
+											className={`font-semibold ${
+												dayType === "Weekend"
+													? "text-red-500"
+													: "text-green-600"
+											}`}
+										>
+											({dayType})
+										</span>
+										.
+									</p>
+
+									<div className="flex flex-col md:flex-row gap-8">
+										<div className="w-full md:w-1/2 flex flex-col gap-6">
+											<div>
+												{/* --- PERUBAHAN DI SINI --- */}
+												<div className="flex items-center gap-3 mb-1">
+													<label className="font-semibold text-lg text-slate-700">
+														Tiket Masuk
+													</label>
+													<span className="bg-cyan-100 text-cyan-800 text-base font-bold px-3 py-1 rounded-full">
+														{formatCurrency(ticketPrice)}
+													</span>
+												</div>
+												<p className="text-sm text-slate-500">
+													Untuk dewasa & anak di atas 80cm.
+												</p>
+												<div className="flex items-center gap-4 mt-2">
+													<button
+														onClick={() => handlePaidTicketChange(-1)}
+														className="w-10 h-10 bg-slate-200 rounded-full font-bold text-xl hover:bg-slate-300"
+													>
+														-
+													</button>
+													<span className="text-2xl font-bold w-12 text-center">
+														{paidTickets}
+													</span>
+													<button
+														onClick={() => handlePaidTicketChange(1)}
+														className="w-10 h-10 bg-cyan-500 text-white rounded-full font-bold text-xl hover:bg-cyan-600"
+													>
+														+
+													</button>
+												</div>
+											</div>
+											<div>
+												<label className="font-semibold text-lg text-slate-700">
+													Anak-anak (di bawah 80cm)
+												</label>
+												<p className="text-sm text-slate-500">Gratis</p>
+												<div className="flex items-center gap-4 mt-2">
+													<button
+														onClick={() => handleChildChange(-1)}
+														className="w-10 h-10 bg-slate-200 rounded-full font-bold text-xl hover:bg-slate-300"
+													>
+														-
+													</button>
+													<span className="text-2xl font-bold w-12 text-center">
+														{childTickets}
+													</span>
+													<button
+														onClick={() => handleChildChange(1)}
+														className="w-10 h-10 bg-cyan-500 text-white rounded-full font-bold text-xl hover:bg-cyan-600"
+													>
+														+
+													</button>
+												</div>
+											</div>
+										</div>
+
+										<div className="w-full md:w-1/2 bg-slate-50 border border-slate-200 rounded-lg p-4 flex flex-col">
+											<h3 className="text-xl font-bold text-slate-800 mb-4 border-b pb-2">
+												Rincian Belanja
+											</h3>
+											<div className="flex-grow space-y-3">
+												{paidTickets > 0 ? (
+													<div className="flex justify-between items-center text-slate-600">
+														<span>Tiket Masuk ({paidTickets}x)</span>
+														<span className="font-medium">
+															{formatCurrency(totalPrice)}
+														</span>
+													</div>
+												) : (
+													<p className="text-slate-400 text-center py-4">
+														Pilih jumlah tiket masuk.
+													</p>
+												)}
+												{childTickets > 0 && (
+													<div className="flex justify-between items-center text-slate-600">
+														<span>Anak-anak ({childTickets}x)</span>
+														<span className="font-medium">Gratis</span>
+													</div>
+												)}
+											</div>
+											<div className="border-t mt-4 pt-4">
+												<div className="flex justify-between items-center font-bold text-xl">
+													<span>Total</span>
+													<span>{formatCurrency(totalPrice)}</span>
+												</div>
+												<button
+													onClick={handleWhatsAppRedirect}
+													disabled={paidTickets === 0}
+													className="w-full mt-4 bg-green-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+												>
+													Pesan Sekarang via WhatsApp
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						)}
 					</div>
 				</div>
 
@@ -254,27 +490,21 @@ const LandingPage = () => {
 						<div className="flex justify-between px-14 gap-10 w-full h-full">
 							<div className="w-full h-full flex justify-center items-center bg-[#F5FFD5] border-2 px-1 border-black rounded-xl">
 								<div className="flex p-5 flex-col gap-4 tracking-tighter z-50 font-bold text-6xl text-white items-center justify-center">
-									<span className="w-auto h-auto p-2 bg-[#B63E40]">
-										Gazebo
-									</span>
+									<span className="w-auto h-auto p-2 bg-[#B63E40]">Gazebo</span>
 									<img src={GazeboPreview} alt="" />
 									<span className="text-[#3F3F3F] text-8xl">100k</span>
 								</div>
 							</div>
 							<div className="w-full h-full flex justify-center items-center bg-[#F5FFD5] border-2 px-1 border-black rounded-xl">
 								<div className="flex p-5 flex-col gap-4 tracking-tighter z-50 font-bold text-6xl text-white items-center justify-center">
-									<span className="w-auto h-auto p-2 bg-[#963EB6]">
-										Tikar
-									</span>
+									<span className="w-auto h-auto p-2 bg-[#963EB6]">Tikar</span>
 									<img src={TikarPreview} alt="" />
 									<span className="text-[#3F3F3F] text-8xl">30k</span>
 								</div>
 							</div>
 							<div className="w-full h-full flex justify-center items-center bg-[#F5FFD5] border-2 px-1 border-black rounded-xl">
 								<div className="flex p-5 flex-col gap-4 tracking-tighter z-50 font-bold text-6xl text-white items-center justify-center">
-									<span className="w-auto h-auto p-2 bg-[#B6763E]">
-										Loker
-									</span>
+									<span className="w-auto h-auto p-2 bg-[#B6763E]">Loker</span>
 									<img src={LokerPreview} alt="" />
 									<span className="text-[#3F3F3F] text-8xl">10k</span>
 								</div>
@@ -282,9 +512,11 @@ const LandingPage = () => {
 						</div>
 
 						<span className="text-red-900 text-center tracking-tighter font-semibold relative z-50 -bottom-4 left-10">
-							*Seluruh penyewaan fasilitas tambahan dapat digunakan <span className="underline font-semibold italic">tanpa batas waktu.</span>
+							*Seluruh penyewaan fasilitas tambahan dapat digunakan{" "}
+							<span className="underline font-semibold italic">
+								tanpa batas waktu.
+							</span>
 						</span>
-
 					</div>
 				</div>
 
@@ -308,7 +540,7 @@ const LandingPage = () => {
 						alphaParticles={false}
 						disableRotation={false}
 					/>
-					
+
 					<div className="relative mt-24">
 						<div className="w-full text-foreground flex flex-col items-center bg-background leading-8 sm:leading-10">
 							<span className="lg:inline flex flex-col tracking-tighter text-3xl md:text-5xl font-semibold px-6 md:px-16 leading-8 sm:leading-6">
@@ -328,10 +560,14 @@ const LandingPage = () => {
 						</div>
 
 						<div className="w-screen h-screen -mt-14 mb-28 z-50">
-							<CircularGallery bend={3} textColor="#000000" borderRadius={0.05} scrollEase={0.02}/>
+							<CircularGallery
+								bend={3}
+								textColor="#000000"
+								borderRadius={0.05}
+								scrollEase={0.02}
+							/>
 						</div>
 					</div>
-
 				</div>
 				<div
 					id="fasilitas-kami"
@@ -366,7 +602,8 @@ const LandingPage = () => {
 							</span>
 
 							<span className="text-sm tracking-tight text-foreground/70 sm:text-lg pt-2 leading-6 sm:leading-8">
-								Rasakan suasana rekreasi di-borneo waterpark yang di-abadikan pelanggan kami. 😍🥰
+								Rasakan suasana rekreasi di-borneo waterpark yang di-abadikan
+								pelanggan kami. 😍🥰
 							</span>
 						</div>
 
@@ -375,7 +612,7 @@ const LandingPage = () => {
 						</div>
 					</div>
 				</div>
-				
+
 				<footer className="flex flex-col border-t">
 					<div className="z-10 px-16 pt-14">
 						<div className="grid grid-cols-1 gap-8 text-center md:text-start md:grid-cols-3">
