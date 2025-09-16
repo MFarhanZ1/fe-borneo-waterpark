@@ -8,7 +8,7 @@ export const NavMenuItems: NavMenuProps = {
     },
     {
       label: "Ada apa aja sih disini? 🤩",
-      location_target: "/#layanan-kami",
+      location_target: "/#fasilitas-kami",
     }
   ],
 };
