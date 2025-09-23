@@ -3,10 +3,6 @@ import BorneoWaterparkLogo from "@/assets/svgs/borneo-waterpark-logo.svg";
 import CartOutline from "@/assets/svgs/cart-outline.svg";
 import UltimateMaps from "@/assets/svgs/ultimate-maps.svg";
 
-import GazeboPreview from "@/assets/svgs/gazebo-preview.svg";
-import TikarPreview from "@/assets/svgs/tikar-preview.svg";
-import LokerPreview from "@/assets/svgs/loker-preview.svg";
-
 import HeaderLandingPageComponent from "@/components/globals/headers/header-landing-page";
 import LoadingComponent from "@/components/globals/loading";
 import { handleGoToDashboard } from "@/utils/pages/publics/landing.page.util";
@@ -48,6 +44,24 @@ const LandingPage = () => {
 	const [paidTickets, setPaidTickets] = useState<number>(1);
 	const [childTickets, setChildTickets] = useState<number>(0);
 
+	const [hargaTiket, setHargaTiket] = useState([
+		{
+			berlaku_untuk: "Weekday",
+			akronim: "30k",
+			harga: 30000,
+		},
+		{
+			berlaku_untuk: "Weekend",
+			akronim: "40k",
+			harga: 40000,
+		},
+		{
+			berlaku_untuk: "Anak_Anak_dibawah_80_cm",
+			akronim: "Gratis",
+			harga: 0,
+		},
+	]);
+
 	// --- useMemo dengan Tipe Data ---
 	const { dayName, dayType, ticketPrice } = useMemo((): IDayInfo => {
 		const dayNames = [
@@ -63,12 +77,15 @@ const LandingPage = () => {
 		const dayIndex = today.getDay();
 		const isWeekend = dayIndex === 0 || dayIndex === 6;
 
+		const hargaWeekend = hargaTiket.filter((item) => item.berlaku_untuk === "Weekend")[0].harga || 0;
+		const hargaWeekday = hargaTiket.filter((item) => item.berlaku_untuk === "Weekday")[0].harga || 0;
+
 		return {
 			dayName: dayNames[dayIndex],
 			dayType: isWeekend ? "Weekend" : "Weekday",
-			ticketPrice: isWeekend ? 40000 : 30000,
+			ticketPrice: isWeekend ? hargaWeekend : hargaWeekday,
 		};
-	}, []);
+	}, [hargaTiket]);
 
 	const totalPrice = useMemo(
 		() => paidTickets * ticketPrice,
@@ -122,6 +139,98 @@ const LandingPage = () => {
 	};
 
 	const auth = useAuth();
+
+	
+
+	useEffect(() => {
+		fetch(`https://fast-api-borneo-waterpark.blk-pariwisata.web.id/tiket/`,
+		{
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		}
+		)
+			.then((data: any) => data.json())
+			.then((data: any) => {
+				setHargaTiket(data)
+				console.log(data)
+			})
+			.catch((error) => {
+				console.error("Error fetching data:", error);
+			});
+	}, []);
+
+	const [ barangDisewakan, setBarangDisewakan ] = useState([]);
+
+	useEffect(() => {
+		fetch(`https://fast-api-borneo-waterpark.blk-pariwisata.web.id/barang/`,
+		{
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		}
+		)
+			.then((data: any) => data.json())
+			.then((data: any) => {
+				setBarangDisewakan(data)
+				console.log(data)
+			})
+			.catch((error) => {
+				console.error("Error fetching data:", error);
+			});
+	}, []);
+	
+	const [ fasilitasTersedia, setFasilitasTersedia ] = useState([]);
+	
+	useEffect(() => {
+		fetch(`https://fast-api-borneo-waterpark.blk-pariwisata.web.id/fasilitas/`,
+		{
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		}
+		)
+			.then((data: any) => data.json())
+			.then((data: any) => {
+				const finalData = data.map((item: any) => ({
+					text: item.nama,
+					image: "https://fast-api-borneo-waterpark.blk-pariwisata.web.id" + item.url_gambar
+				}))
+				setFasilitasTersedia(finalData)
+				console.log(finalData)
+			})
+			.catch((error) => {
+				console.error("Error fetching data:", error);
+			});
+	}, []);
+	
+	const [ dokumentasiCust, setDokumentasiCust ] = useState([]);
+	
+	useEffect(() => {
+		fetch(`https://fast-api-borneo-waterpark.blk-pariwisata.web.id/dokumentasi/`,
+		{
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		}
+		)
+			.then((data: any) => data.json())
+			.then((data: any) => {
+				const finalData = data.map((item: any) => ({
+					alt: item.nama,
+					src: "https://fast-api-borneo-waterpark.blk-pariwisata.web.id" + item.url_gambar
+				}))
+				setDokumentasiCust(finalData)
+				console.log(finalData)
+			})
+			.catch((error) => {
+				console.error("Error fetching data:", error);
+			});
+	}, []);
 
 	const handleKeycloakAuth = () =>
 		auth.isAuthenticated
@@ -260,7 +369,7 @@ const LandingPage = () => {
 									<span className="w-auto h-auto p-2 bg-[#3E90B6]">
 										Weekday
 									</span>
-									<span className="text-[#3F3F3F] text-8xl">30k</span>
+									<span className="text-[#3F3F3F] text-8xl">{hargaTiket.filter(tiket => tiket.berlaku_untuk === "Weekday")[0].akronim}</span>
 								</div>
 							</div>
 							<div className="w-full h-full bg-[#F5FFD5] border-2 px-10 flex justify-center items-center border-black rounded-xl">
@@ -273,7 +382,7 @@ const LandingPage = () => {
 											Tinggi di-Bawah 80 cm
 										</span>
 									</div>
-									<span className="text-[#3F3F3F] text-8xl">Gratis</span>
+									<span className="text-[#3F3F3F] text-8xl">{hargaTiket.filter(tiket => tiket.berlaku_untuk === "Anak_Anak_dibawah_80_cm")[0].akronim}</span>
 								</div>
 							</div>
 							<div className="w-full h-full flex justify-center items-center bg-[#F5FFD5] border-2 px-10 py-20 border-black rounded-xl">
@@ -281,7 +390,7 @@ const LandingPage = () => {
 									<span className="w-auto h-auto p-2 bg-[#743EB6]">
 										Weekend
 									</span>
-									<span className="text-[#3F3F3F] text-8xl">30k</span>
+									<span className="text-[#3F3F3F] text-8xl">{hargaTiket.filter(tiket => tiket.berlaku_untuk === "Weekend")[0].akronim}</span>
 								</div>
 							</div>
 						</div>
@@ -488,27 +597,17 @@ const LandingPage = () => {
 						</div>
 
 						<div className="flex justify-between px-14 gap-10 w-full h-full">
-							<div className="w-full h-full flex justify-center items-center bg-[#F5FFD5] border-2 px-1 border-black rounded-xl">
-								<div className="flex p-5 flex-col gap-4 tracking-tighter z-50 font-bold text-6xl text-white items-center justify-center">
-									<span className="w-auto h-auto p-2 bg-[#B63E40]">Gazebo</span>
-									<img src={GazeboPreview} alt="" />
-									<span className="text-[#3F3F3F] text-8xl">100k</span>
-								</div>
-							</div>
-							<div className="w-full h-full flex justify-center items-center bg-[#F5FFD5] border-2 px-1 border-black rounded-xl">
-								<div className="flex p-5 flex-col gap-4 tracking-tighter z-50 font-bold text-6xl text-white items-center justify-center">
-									<span className="w-auto h-auto p-2 bg-[#963EB6]">Tikar</span>
-									<img src={TikarPreview} alt="" />
-									<span className="text-[#3F3F3F] text-8xl">30k</span>
-								</div>
-							</div>
-							<div className="w-full h-full flex justify-center items-center bg-[#F5FFD5] border-2 px-1 border-black rounded-xl">
-								<div className="flex p-5 flex-col gap-4 tracking-tighter z-50 font-bold text-6xl text-white items-center justify-center">
-									<span className="w-auto h-auto p-2 bg-[#B6763E]">Loker</span>
-									<img src={LokerPreview} alt="" />
-									<span className="text-[#3F3F3F] text-8xl">10k</span>
-								</div>
-							</div>
+							{
+								barangDisewakan.map((barang: { nama: string; akronim: string; url_gambar: string }, index) => (								
+									<div key={index} className="w-full h-full flex justify-center items-center bg-[#F5FFD5] border-2 px-1 border-black rounded-xl">
+										<div className="flex p-5 flex-col gap-4 tracking-tighter z-50 font-bold text-6xl text-white items-center justify-center">
+											<span className={`w-auto h-auto p-2 ${index === 1 ? "bg-[#963EB6]" : index === 2 ? "bg-[#B6763E]" : "bg-[#B63E40]" }`}>{barang.nama}</span>
+											<img src={"https://fast-api-borneo-waterpark.blk-pariwisata.web.id" + barang.url_gambar} alt="" />
+											<span className="text-[#3F3F3F] text-8xl">{barang.akronim}</span>
+										</div>
+									</div>							
+								))
+							}
 						</div>
 
 						<span className="text-red-900 text-center tracking-tighter font-semibold relative z-50 -bottom-4 left-10">
@@ -561,6 +660,7 @@ const LandingPage = () => {
 
 						<div className="w-screen h-screen -mt-14 mb-28 z-50">
 							<CircularGallery
+								items={fasilitasTersedia}
 								bend={3}
 								textColor="#000000"
 								borderRadius={0.05}
@@ -608,7 +708,7 @@ const LandingPage = () => {
 						</div>
 
 						<div className="w-screen h-screen z-50">
-							<DomeGallery />
+							<DomeGallery images={dokumentasiCust} />
 						</div>
 					</div>
 				</div>
