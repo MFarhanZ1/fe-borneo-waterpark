@@ -77,8 +77,12 @@ const LandingPage = () => {
 		const dayIndex = today.getDay();
 		const isWeekend = dayIndex === 0 || dayIndex === 6;
 
-		const hargaWeekend = hargaTiket.filter((item) => item.berlaku_untuk === "Weekend")[0].harga || 0;
-		const hargaWeekday = hargaTiket.filter((item) => item.berlaku_untuk === "Weekday")[0].harga || 0;
+		const hargaWeekend =
+			hargaTiket.filter((item) => item.berlaku_untuk === "Weekend")[0].harga ||
+			0;
+		const hargaWeekday =
+			hargaTiket.filter((item) => item.berlaku_untuk === "Weekday")[0].harga ||
+			0;
 
 		return {
 			dayName: dayNames[dayIndex],
@@ -140,92 +144,155 @@ const LandingPage = () => {
 
 	const auth = useAuth();
 
-	
-
 	useEffect(() => {
-		fetch(`https://fast-api-borneo-waterpark.blk-pariwisata.web.id/tiket/`,
-		{
+		fetch(`${import.meta.env.VITE_API_URL}/tiket/`, {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
 			},
-		}
-		)
+		})
 			.then((data: any) => data.json())
 			.then((data: any) => {
-				setHargaTiket(data)
-				console.log(data)
+				setHargaTiket(data);
+				console.log(data);
 			})
 			.catch((error) => {
 				console.error("Error fetching data:", error);
 			});
 	}, []);
 
-	const [ barangDisewakan, setBarangDisewakan ] = useState([]);
+	const [barangDisewakan, setBarangDisewakan] = useState([
+		{
+			nama: "Gazebo",
+			akronim: "100k",
+			url_gambar: "/static/images/3ad59e74-c498-4b57-9126-10a2a1e62500-gazebo-preview-88dm4maO.svg",
+		},
+		{
+			nama: "Tikar",
+			akronim: "30k",
+			url_gambar: "/static/images/fe855b6a-32ad-4304-9a7f-5be51fcb0d79-tikar-preview-BNQAFj4J.svg",
+		},
+		{
+			nama: "Loker",
+			akronim: "10k",
+			url_gambar: "/static/images/931b12f4-1871-40ca-a6e0-d536aeacfbfe-loker-preview-CusoLwjq.svg",
+		},
+		
+	]);
 
 	useEffect(() => {
-		fetch(`https://fast-api-borneo-waterpark.blk-pariwisata.web.id/barang/`,
-		{
+		fetch(`${import.meta.env.VITE_API_URL}/barang/`, {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
 			},
-		}
-		)
+		})
 			.then((data: any) => data.json())
 			.then((data: any) => {
-				setBarangDisewakan(data)
-				console.log(data)
+				setBarangDisewakan(data);
+				console.log(data);
 			})
 			.catch((error) => {
 				console.error("Error fetching data:", error);
 			});
 	}, []);
-	
-	const [ fasilitasTersedia, setFasilitasTersedia ] = useState([]);
-	
-	useEffect(() => {
-		fetch(`https://fast-api-borneo-waterpark.blk-pariwisata.web.id/fasilitas/`,
+
+	const [fasilitasTersedia, setFasilitasTersedia] = useState([
 		{
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json",
-			},
-		}
+			text: "Mandi Busa",
+			image: "${import.meta.env.VITE_API_URL}/static/images/6f04edaf-16fa-4df4-bac2-d9347636c313-mandi-busa-preview.jpg",
+		},
+		{
+			text: "Kawah Biru",
+			image: "${import.meta.env.VITE_API_URL}/static/images/e732f81f-f037-4351-b21a-e676482c37a5-kawah-biru-preview.jpg",
+		},
+		{
+			text: "Kolam Dewasa",
+			image: "${import.meta.env.VITE_API_URL}/static/images/b5e31e5e-089c-475e-80e0-20c68b6c93ba-kolam-dewasa-preview.jpg",
+		},
+		{
+			text: "Kolam Anak-Anak",
+			image: "${import.meta.env.VITE_API_URL}/static/images/6c009562-5f18-48fa-875c-12d263bcc0ad-kolam-anak-anak-preview.jpg",
+		},
+	]);
+
+	useEffect(() => {
+		fetch(
+			`${import.meta.env.VITE_API_URL}/fasilitas/`,
+			{
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			}
 		)
 			.then((data: any) => data.json())
 			.then((data: any) => {
 				const finalData = data.map((item: any) => ({
 					text: item.nama,
-					image: "https://fast-api-borneo-waterpark.blk-pariwisata.web.id" + item.url_gambar
-				}))
-				setFasilitasTersedia(finalData)
-				console.log(finalData)
+					image:
+						import.meta.env.VITE_API_URL +
+						item.url_gambar,
+				}));
+				setFasilitasTersedia(finalData);
+				console.log(finalData);
 			})
 			.catch((error) => {
 				console.error("Error fetching data:", error);
 			});
 	}, []);
-	
-	const [ dokumentasiCust, setDokumentasiCust ] = useState([]);
-	
-	useEffect(() => {
-		fetch(`https://fast-api-borneo-waterpark.blk-pariwisata.web.id/dokumentasi/`,
+
+	const [dokumentasiCust, setDokumentasiCust] = useState([
 		{
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json",
-			},
-		}
+			src: "https://images.trvl-media.com/lodging/1000000/10000/3900/3858/18b2638a.jpg?impolicy=resizecrop&rw=575&rh=575&ra=fill",
+			alt: "Abstract art",
+		},
+		{
+			src: "https://awsimages.detik.net.id/community/media/visual/2024/01/27/tropikana-waterpark-cirebon_169.jpeg?w=1200",
+			alt: "Modern sculpture",
+		},
+		{
+			src: "https://www.shutterstock.com/image-illustration/empty-colorful-waterslides-resort-aquapark-600nw-2310273541.jpg",
+			alt: "Digital artwork",
+		},
+		{
+			src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSW3xSxQsSK_OQzs-6FhfA-zg9ANFfyXxfjeqEfN4wjWxqgf6yytL_pbxmZ7a5V3RVnwH8&usqp=CAU",
+			alt: "Contemporary art",
+		},
+		{
+			src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYfKn3VMXhuu8bX89yi0QX6DEQmm4yhxI_mg&s",
+			alt: "Geometric pattern",
+		},
+		{
+			src: "https://img1.10bestmedia.com/Images/Photos/412869/Splashway-Waterpark_54_990x660.jpg?auto=webp&width=3840&quality=75",
+			alt: "Textured surface",
+		},
+		{
+			src: "https://www.510families.com/wp-content/uploads/2018/07/dublin-wave-2241453_o.jpg",
+			alt: "Social media image",
+		},
+	]);
+
+	useEffect(() => {
+		fetch(
+			`${import.meta.env.VITE_API_URL}/dokumentasi/`,
+			{
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			}
 		)
 			.then((data: any) => data.json())
 			.then((data: any) => {
 				const finalData = data.map((item: any) => ({
 					alt: item.nama,
-					src: "https://fast-api-borneo-waterpark.blk-pariwisata.web.id" + item.url_gambar
-				}))
-				setDokumentasiCust(finalData)
-				console.log(finalData)
+					src:
+						import.meta.env.VITE_API_URL +
+						item.url_gambar,
+				}));
+				setDokumentasiCust(finalData);
+				console.log(finalData);
 			})
 			.catch((error) => {
 				console.error("Error fetching data:", error);
@@ -369,7 +436,13 @@ const LandingPage = () => {
 									<span className="w-auto h-auto p-2 bg-[#3E90B6]">
 										Weekday
 									</span>
-									<span className="text-[#3F3F3F] text-8xl">{hargaTiket.filter(tiket => tiket.berlaku_untuk === "Weekday")[0].akronim}</span>
+									<span className="text-[#3F3F3F] text-8xl">
+										{
+											hargaTiket.filter(
+												(tiket) => tiket.berlaku_untuk === "Weekday"
+											)[0].akronim
+										}
+									</span>
 								</div>
 							</div>
 							<div className="w-full h-full bg-[#F5FFD5] border-2 px-10 flex justify-center items-center border-black rounded-xl">
@@ -382,7 +455,14 @@ const LandingPage = () => {
 											Tinggi di-Bawah 80 cm
 										</span>
 									</div>
-									<span className="text-[#3F3F3F] text-8xl">{hargaTiket.filter(tiket => tiket.berlaku_untuk === "Anak_Anak_dibawah_80_cm")[0].akronim}</span>
+									<span className="text-[#3F3F3F] text-8xl">
+										{
+											hargaTiket.filter(
+												(tiket) =>
+													tiket.berlaku_untuk === "Anak_Anak_dibawah_80_cm"
+											)[0].akronim
+										}
+									</span>
 								</div>
 							</div>
 							<div className="w-full h-full flex justify-center items-center bg-[#F5FFD5] border-2 px-10 py-20 border-black rounded-xl">
@@ -390,7 +470,13 @@ const LandingPage = () => {
 									<span className="w-auto h-auto p-2 bg-[#743EB6]">
 										Weekend
 									</span>
-									<span className="text-[#3F3F3F] text-8xl">{hargaTiket.filter(tiket => tiket.berlaku_untuk === "Weekend")[0].akronim}</span>
+									<span className="text-[#3F3F3F] text-8xl">
+										{
+											hargaTiket.filter(
+												(tiket) => tiket.berlaku_untuk === "Weekend"
+											)[0].akronim
+										}
+									</span>
 								</div>
 							</div>
 						</div>
@@ -597,17 +683,41 @@ const LandingPage = () => {
 						</div>
 
 						<div className="flex justify-between px-14 gap-10 w-full h-full">
-							{
-								barangDisewakan.map((barang: { nama: string; akronim: string; url_gambar: string }, index) => (								
-									<div key={index} className="w-full h-full flex justify-center items-center bg-[#F5FFD5] border-2 px-1 border-black rounded-xl">
+							{barangDisewakan.map(
+								(
+									barang: { nama: string; akronim: string; url_gambar: string },
+									index
+								) => (
+									<div
+										key={index}
+										className="w-full h-full flex justify-center items-center bg-[#F5FFD5] border-2 px-1 border-black rounded-xl"
+									>
 										<div className="flex p-5 flex-col gap-4 tracking-tighter z-50 font-bold text-6xl text-white items-center justify-center">
-											<span className={`w-auto h-auto p-2 ${index === 1 ? "bg-[#963EB6]" : index === 2 ? "bg-[#B6763E]" : "bg-[#B63E40]" }`}>{barang.nama}</span>
-											<img src={"https://fast-api-borneo-waterpark.blk-pariwisata.web.id" + barang.url_gambar} alt="" />
-											<span className="text-[#3F3F3F] text-8xl">{barang.akronim}</span>
+											<span
+												className={`w-auto h-auto p-2 ${
+													index === 1
+														? "bg-[#963EB6]"
+														: index === 2
+														? "bg-[#B6763E]"
+														: "bg-[#B63E40]"
+												}`}
+											>
+												{barang.nama}
+											</span>
+											<img
+												src={
+													import.meta.env.VITE_API_URL +
+													barang.url_gambar
+												}
+												alt=""
+											/>
+											<span className="text-[#3F3F3F] text-8xl">
+												{barang.akronim}
+											</span>
 										</div>
-									</div>							
-								))
-							}
+									</div>
+								)
+							)}
 						</div>
 
 						<span className="text-red-900 text-center tracking-tighter font-semibold relative z-50 -bottom-4 left-10">

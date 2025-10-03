@@ -88,7 +88,7 @@ const HeaderLandingPageComponent = ({
       {/* Nav Menu Desktop */}
       <div className="items-center justify-center hidden gap-5 lg:flex">
         <NavMenu navMenu={NavMenuItems.LandingPage} />
-        {/* <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-center gap-2">
           {isAuthenticated && (
             <NavLink to={dashboardURL}>
               <Button size={"sm"} variant={"outline"}>
@@ -114,7 +114,7 @@ const HeaderLandingPageComponent = ({
               </Button>
             </AlertDialogTrigger>
           )}
-        </div> */}
+        </div>
       </div>
       <AlertDialogContent>
         <AlertDialogHeader>
