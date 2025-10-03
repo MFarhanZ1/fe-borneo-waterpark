@@ -403,9 +403,6 @@ const LandingPage = () => {
 							Jam Operasional 09.00-18.00 WIB.
 						</span>
 					</div>
-				</div>
-
-				{/* Info Tiket Masuk */}
 				<Particles
 					particleColors={[
 						"#A07CFE",
@@ -422,6 +419,9 @@ const LandingPage = () => {
 					alphaParticles={false}
 					disableRotation={false}
 				/>
+				</div>
+
+				{/* Info Tiket Masuk */}
 				<div className="w-full h-[31.5rem] rounded-2xl px-24 py-8">
 					<div className="w-full h-full relative rounded-2xl pt-14 pb-16 border-2 border-black">
 						<div className="absolute -top-8 left-1/2 -translate-x-1/2 flex tracking-tighter z-50 font-bold text-5xl text-white items-center justify-center">
@@ -451,7 +451,7 @@ const LandingPage = () => {
 										<span className="w-auto h-auto p-2 bg-[#B63E3E]">
 											Anak-Anak
 										</span>
-										<span className="w-auto h-auto p-2 text-[1.77rem] bg-[#54B63E]">
+										<span className="w-auto h-auto p-2 text-[1.63rem] bg-[#54B63E]">
 											Tinggi di-Bawah 80 cm
 										</span>
 									</div>
@@ -656,6 +656,8 @@ const LandingPage = () => {
 						)}
 					</div>
 				</div>
+
+				<InfoSections />
 
 				{/* Info Tiket Masuk */}
 				<Particles
@@ -972,3 +974,136 @@ const LandingPage = () => {
 };
 
 export default LandingPage;
+
+
+import {
+    ShieldCheck,
+    Users,
+    Droplets,
+    SmilePlus,
+    Award,
+    Eye,
+    Ruler,
+    Footprints,
+    Sun,
+    LifeBuoy,
+} from "lucide-react";
+
+const InfoSections = () => {
+    // Data untuk seksi "Kenapa Memilih Kami"
+    const whyUsData = [
+        {
+            icon: <Users className="w-12 h-12 text-cyan-600 mb-4" />,
+            title: "2k+ Pengunjung/Week",
+            description: "Telah dipercaya oleh ribuan pengunjung setiap minggunya untuk rekreasi keluarga.",
+            bgColor: "bg-cyan-50",
+        },
+        {
+            icon: <Droplets className="w-12 h-12 text-blue-600 mb-4" />,
+            title: "Air Kolam Higienis",
+            description: "Kualitas air selalu kami jaga dengan sistem filtrasi modern agar tetap jernih dan aman.",
+            bgColor: "bg-blue-50",
+        },
+        {
+            icon: <SmilePlus className="w-12 h-12 text-green-600 mb-4" />,
+            title: "Wahana Untuk Semua",
+            description: "Dari kolam anak yang dangkal hingga seluncuran menantang, semua ada di sini!",
+            bgColor: "bg-green-50",
+        },
+        {
+            icon: <Award className="w-12 h-12 text-yellow-600 mb-4" />,
+            title: "Harga Terjangkau",
+            description: "Nikmati keseruan maksimal tanpa menguras kantong. Liburan jadi lebih hemat!",
+            bgColor: "bg-yellow-50",
+        },
+    ];
+
+    // Data untuk seksi "Informasi Keselamatan"
+    const safetyTips = [
+        {
+            icon: <Eye className="w-8 h-8 text-cyan-700 flex-shrink-0" />,
+            text: "Selalu awasi buah hati Anda saat bermain di area kolam untuk mencegah hal yang tidak diinginkan.",
+        },
+        {
+            icon: <Ruler className="w-8 h-8 text-cyan-700 flex-shrink-0" />,
+            text: "Patuhi aturan tinggi dan berat badan di setiap wahana seluncuran demi keselamatan bersama.",
+        },
+        {
+            icon: <Footprints className="w-8 h-8 text-cyan-700 flex-shrink-0" />,
+            text: "Area tepi kolam mungkin licin. Harap berjalan perlahan dan tidak berlari-larian.",
+        },
+        {
+            icon: <Sun className="w-8 h-8 text-cyan-700 flex-shrink-0" />,
+            text: "Gunakan tabir surya untuk melindungi kulit dari paparan sinar matahari langsung.",
+        },
+        {
+            icon: <LifeBuoy className="w-8 h-8 text-cyan-700 flex-shrink-0" />,
+            text: "Jika butuh bantuan, jangan ragu untuk menghubungi petugas penjaga kolam kami yang bersiaga.",
+        },
+    ];
+
+    return (
+        <>
+            {/* Section: Kenapa Memilih Kami? */}
+            <div className="w-full h-auto px-8 z-[999] sm:px-16 lg:px-24 py-16 text-center">
+                <div className="flex tracking-tighter z-50 font-bold text-4xl sm:text-5xl text-slate-800 items-center justify-center mb-4">
+                    <span className="w-auto h-auto px-5 py-2 z-[9999] bg-[#F5FFD5] border-2 border-black rounded-lg">
+                        Keseruan Menantimu!
+                    </span>
+                </div>
+                <p className="text-lg text-slate-800 max-w-2xl mx-auto mb-12 z-[99999]">
+                    Kami bukan sekadar kolam renang biasa. Kami adalah destinasi favorit keluarga di Pekanbaru untuk menciptakan kenangan tak terlupakan.
+                </p>
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-8">
+                    {whyUsData.map((item, index) => (
+                        <div key={index} className={`w-full h-full flex flex-col justify-start items-center ${item.bgColor} border-2 border-black rounded-xl p-6 transform hover:-translate-y-2 transition-transform duration-300`}>
+                            {item.icon}
+                            <h3 className="text-2xl font-bold text-slate-800 tracking-tight mb-2">
+                                {item.title}
+                            </h3>
+                            <p className="text-slate-600 text-base">{item.description}</p>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Section: Informasi Keselamatan Anak */}
+            <div id="info-keselamatan" className="w-full h-auto px-8 sm:px-16 lg:px-24 py-20 bg-[#F5FFD5]">
+                <div className="w-full h-full relative rounded-2xl p-8 sm:p-14 border-2 border-black bg-white">
+                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 flex tracking-tighter z-50 font-bold text-4xl sm:text-5xl text-white items-center justify-center">
+                        <span className="w-auto h-auto p-2 bg-[#A76868]">
+                            Info Keselamatan.
+                        </span>
+                    </div>
+                    
+                    <div className="flex flex-col lg:flex-row items-center gap-12">
+                        {/* Kolom Kiri: Ikon dan Judul */}
+                        <div className="flex flex-col items-center text-center lg:w-1/3">
+                            <ShieldCheck className="w-24 h-24 text-green-500 mb-4" />
+                            <h2 className="text-3xl font-bold tracking-tighter text-slate-800">
+                                Keselamatan si Kecil, Prioritas Kami
+                            </h2>
+                            <p className="text-slate-600 mt-2">
+                                Kami ingin semua orang bersenang-senang dengan aman. Mohon perhatikan beberapa tips berikut ini.
+                            </p>
+                        </div>
+
+                        {/* Kolom Kanan: Daftar Tips */}
+                        <div className="lg:w-2/3 w-full">
+                            <div className="space-y-6">
+                                {safetyTips.map((tip, index) => (
+                                    <div key={index} className="flex items-start gap-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
+                                        {tip.icon}
+                                        <p className="text-slate-700 text-left text-base sm:text-lg">
+                                            {tip.text}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    );
+};
